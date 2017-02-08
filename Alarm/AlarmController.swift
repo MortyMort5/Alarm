@@ -7,26 +7,18 @@
 //
 
 import Foundation
+import UIKit
+import UserNotifications
 
 class AlarmController {
     
-    var alarms: [Alarm]
+    var alarms: [Alarm] = []
     
     static let shared = AlarmController()
     
     private let alarmDictionaryArrayKey = "alarmDictionaryArray"
     
     init() {
-        let moc1 = Alarm(fireTimeFromMidnight: 25200, name: "popTart", enabled: false, uuid: "1")
-        let moc2 = Alarm(fireTimeFromMidnight: 25200, name: "daddyJoe", enabled: false, uuid: "2")
-        let moc3 = Alarm(fireTimeFromMidnight: 25200, name: "mort", enabled: false, uuid: "3")
-        let moc4 = Alarm(fireTimeFromMidnight: 25200, name: "nerd", enabled: false, uuid: "5")
-        let moc5 = Alarm(fireTimeFromMidnight: 25200, name: "coders", enabled: false, uuid: "4")
-        let moc6 = Alarm(fireTimeFromMidnight: 25200, name: "timeToSleep", enabled: false, uuid: "6")
-        let moc7 = Alarm(fireTimeFromMidnight: 25200, name: "hippor", enabled: false, uuid: "7")
-        
-        alarms = [moc1, moc2, moc3, moc4, moc5, moc6, moc7]
-        
         loadFromPersistentStore()
     }
     
@@ -42,6 +34,7 @@ class AlarmController {
         alarm.fireTimeFromMidnight = fireTimeFromMidnight
         alarm.name = name
         saveToPersistentStore()
+        print("update")
     }
     
     func delete(alarm: Alarm) {
@@ -56,36 +49,59 @@ class AlarmController {
         } else {
                 alarm.enabled = true
         }
+        saveToPersistentStore()
+    }
+    
+    static private var persistentAlarmsFilePath: String? {
+        let directories = NSSearchPathForDirectoriesInDomains(.documentDirectory, .allDomainsMask, true)
+        guard let documentsDirectory = directories.first as NSString? else { return nil }
+        return documentsDirectory.appendingPathComponent("Alarms.plist")
     }
     
     private func saveToPersistentStore() {
-        var alarmDictionaryArray: [[String: Any]] = []
-        for alarm in alarms {
-            let alarmDictionary = alarm.dictionaryRepresentation()
-            alarmDictionaryArray.append(alarmDictionary)
-        }
-        UserDefaults.standard.set(alarmDictionaryArray, forKey: alarmDictionaryArrayKey)
+        guard let filePath = type(of: self).persistentAlarmsFilePath else { return }
+        NSKeyedArchiver.archiveRootObject(self.alarms, toFile: filePath)
     }
     
     func loadFromPersistentStore() {
-        if let alarmDictionaryArray = UserDefaults.standard.value(forKey: alarmDictionaryArrayKey) as? [[String: Any]] {
-            var alarmArray: [Alarm] = []
-            
-            for alarmDictionary in alarmDictionaryArray {
-                if let alarm = Alarm(dictionary: alarmDictionary) {
-                    alarmArray.append(alarm)
-                }
+        guard let filePath = type(of: self).persistentAlarmsFilePath else { return }
+        guard let alarms = NSKeyedUnarchiver.unarchiveObject(withFile: filePath) as? [Alarm] else { return }
+        self.alarms = alarms
+        print("loadFromPersistentStore")
+    }
+}
+
+protocol AlarmScheduler {
+    func scheduleLocalNotification(for alarm: Alarm)
+    func cancelLocalNotification(for alarm: Alarm)
+}
+
+extension AlarmScheduler {
+    func scheduleLocalNotification(for alarm: Alarm) {
+        let notificationContent = UNMutableNotificationContent()
+        notificationContent.userInfo = ["UUID" : alarm.uuid]
+        notificationContent.title = "Out Of Time Loser!"
+        notificationContent.body = "Your alarm \(alarm.name) is out of time"
+        notificationContent.sound = UNNotificationSound.default()
+        
+        guard let fireDate = alarm.fireDate else { return }
+        let triggerDate = Calendar.current.dateComponents([.hour, .minute, .second], from: fireDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: true)
+        
+        let request = UNNotificationRequest(identifier: alarm.uuid, content: notificationContent, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { (error) in
+            if let error = error {
+                print("Unable notification, \(error.localizedDescription)")
             }
-            self.alarms = alarmArray
+            
         }
     }
     
     
-    
+    func cancelLocalNotification(for alarm: Alarm) {
+       UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [alarm.uuid])
+    }
 }
-
-
-
 
 
 

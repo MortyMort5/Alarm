@@ -17,7 +17,7 @@ class SwitchTableViewCell: UITableViewCell {
     @IBOutlet weak var alarmSwitch: UISwitch!
     
     @IBAction func switchValueChanged(_ sender: UISwitch) {
-        delegate?.alarmValueChanged(self, selected: sender.isOn)
+        delegate?.switchCellSwitchValueChanged(cell: self)
     }
     
     var alarm: Alarm? {
@@ -26,11 +26,12 @@ class SwitchTableViewCell: UITableViewCell {
             timeLabel.text = alarm.fireTimeAsString
             nameLabel.text = alarm.name
             alarmSwitch.isOn = alarm.enabled
+            print("didSet")
         }
     }
     
 }
 
 protocol SwitchTableViewCellDelegate: class {
-    func alarmValueChanged(_ cell: SwitchTableViewCell, selected: Bool)
+    func switchCellSwitchValueChanged(cell: SwitchTableViewCell)
 }

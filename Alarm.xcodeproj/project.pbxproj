@@ -143,7 +143,7 @@
 				TargetAttributes = {
 					1A0FB77A1CDD4F07006808D9 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 357NQPN89X;
+						DevelopmentTeam = 7NXZ3S6BQC;
 						LastSwiftMigration = 0800;
 					};
 				};
@@ -308,8 +308,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 357NQPN89X;
+				DEVELOPMENT_TEAM = 7NXZ3S6BQC;
 				INFOPLIST_FILE = Alarm/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.devmountain.Alarm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -321,8 +322,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 357NQPN89X;
+				DEVELOPMENT_TEAM = 7NXZ3S6BQC;
 				INFOPLIST_FILE = Alarm/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.devmountain.Alarm;
 				PRODUCT_NAME = "$(TARGET_NAME)";

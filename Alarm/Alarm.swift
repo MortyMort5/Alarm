@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class Alarm: Equatable {
+class Alarm: NSObject, NSCoding {
     
     
     private let fireTimeFromMidnightKey = "fireTimeFromMidnight"
@@ -41,29 +41,35 @@ class Alarm: Equatable {
     }
     
     
-    init?(dictionary: [String: Any]) {
-        guard let fireTimeFromMidnight = dictionary[fireTimeFromMidnightKey] as? TimeInterval,
-            let name =  dictionary[nameKey] as? String,
-            let enabled = dictionary[enabledKey] as? Bool,
-            let uuid = dictionary[uuidKey] as? String else  {
-                
-            return nil
-        }
+    required init?(coder aDecoder: NSCoder) {
+        guard let fireTimeFromMidnight = aDecoder.decodeObject(forKey: fireTimeFromMidnightKey) as? TimeInterval,
+            let name =  aDecoder.decodeObject(forKey: nameKey) as? String,
+            let enabled = aDecoder.decodeObject(forKey: enabledKey) as? Bool,
+            let uuid = aDecoder.decodeObject(forKey: uuidKey) as? String else  { return nil }
         self.fireTimeFromMidnight = fireTimeFromMidnight
         self.name = name
         self.enabled = enabled
         self.uuid = uuid
     }
     
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(self.fireTimeFromMidnight, forKey: fireTimeFromMidnightKey)
+        aCoder.encode(self.name, forKey: nameKey)
+        aCoder.encode(self.enabled, forKey: enabledKey)
+        aCoder.encode(self.uuid, forKey: uuidKey)
+    }
+    
     
     
     var fireDate: Date? {
+        print("fireDate")
         guard let thisMorningAtMidnight = DateHelper.thisMorningAtMidnight else {return nil}
         let fireDateFromThisMorning = Date(timeInterval: fireTimeFromMidnight, since: thisMorningAtMidnight as Date)
         return fireDateFromThisMorning
     }
     
     var fireTimeAsString: String {
+        print("fireTimeAsString")
         let fireTimeFromMidnight = Int(self.fireTimeFromMidnight)
         var hours = fireTimeFromMidnight/60/60
         let minutes = (fireTimeFromMidnight - (hours*60*60))/60
@@ -78,9 +84,6 @@ class Alarm: Equatable {
             return String(format: "%2d:%02d AM", arguments: [hours, minutes])
         }
     }
-    
-    
-    
 }
 
 

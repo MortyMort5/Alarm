@@ -17,6 +17,7 @@ class AlarmListTableViewController: UITableViewController, SwitchTableViewCellDe
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+        print("viewWillAppear")
     }
 
     // MARK: - Table view data source
@@ -48,19 +49,15 @@ class AlarmListTableViewController: UITableViewController, SwitchTableViewCellDe
         alarm.enabled = selected
         tableView.reloadRows(at: [cellIndexPath], with: .automatic)
         tableView.endUpdates()
-        
+        print("alarmValueChanged")
     }
     
     func switchCellSwitchValueChanged(cell: SwitchTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else {return}
         let alarm = AlarmController.shared.alarms[(indexPath as NSIndexPath).row]
         AlarmController.shared.toggleEnabled(for: alarm)
-//        if alarm.enabled {
-//            scheduleLocalNotification(for: alarm)
-//        } else {
-//            cancelLocalNotification(for: alarm)
-//        }
         tableView.reloadRows(at: [indexPath], with: .automatic)
+        print("switchCellSwitchValueChanged")
     }
     
 
